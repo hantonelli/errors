@@ -148,19 +148,35 @@ func (e WrappedErrorImpl) GetStacktrace() string {
 	return e.stacktrace
 }
 
-// NewWithMessage returns a new WrappedErrorImpl with the provided message and fields.
-func NewWithMessage(message string, fields map[string]interface{}) *WrappedErrorImpl {
+// NewWithMsg returns a new WrappedErrorImpl with the provided message.
+func NewWithMsg(message string) *WrappedErrorImpl {
+	actual := errors.New(message)
+	return createWrappedError(nil, actual, nil)
+}
+
+// NewWithMsgAndFields returns a new WrappedErrorImpl with the provided message and fields.
+func NewWithMsgAndFields(message string, fields map[string]interface{}) *WrappedErrorImpl {
 	actual := errors.New(message)
 	return createWrappedError(nil, actual, fields)
 }
 
-// NewWithError returns a new WrappedErrorImpl with the provided error and fields.
-func NewWithError(actual error, fields map[string]interface{}) *WrappedErrorImpl {
+// NewWithError returns a new WrappedErrorImpl with the provided error.
+func NewWithError(actual error) *WrappedErrorImpl {
+	return createWrappedError(nil, actual, nil)
+}
+
+// NewWithErrorAndFields returns a new WrappedErrorImpl with the provided error and fields.
+func NewWithErrorAndFields(actual error, fields map[string]interface{}) *WrappedErrorImpl {
 	return createWrappedError(nil, actual, fields)
 }
 
-// WithError takes the previous error, the actual error and the fields associated with it and returns a new WrappedErrorImpl.
-func WithError(previous error, actual error, fields map[string]interface{}) *WrappedErrorImpl {
+// WithError takes the previous error and the actual error and, returns a new WrappedErrorImpl.
+func WithError(previous error, actual error) *WrappedErrorImpl {
+	return createWrappedError(previous, actual, nil)
+}
+
+// WithErrorAndFields takes the previous error, the actual error and the fields associated with it and returns a new WrappedErrorImpl.
+func WithErrorAndFields(previous error, actual error, fields map[string]interface{}) *WrappedErrorImpl {
 	return createWrappedError(previous, actual, fields)
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
+	"strings"
 )
 
 var fields = map[string]interface{}{
@@ -18,8 +19,8 @@ func TestNewWithMessage(t *testing.T) {
 	t.Run("handle message and no fields", func(t *testing.T) {
 		message := fmt.Sprintf("error vii, %v", 22)
 
-		var err error = NewWithMessage(message, nil)
-		assert.Equal(t, err.Error(), "Message: error vii, 22. Location: /github.com/hantonelli/errors/wrappederror_test.go:21")
+		var err error = NewWithMsgAndFields(message, nil)
+		assert.Equal(t, err.Error(), "Message: error vii, 22. Location: /github.com/hantonelli/errors/wrappederror_test.go:22")
 		assert.NotNil(t, err)
 		we, ok := err.(WrappedError)
 		if !ok {
@@ -35,14 +36,14 @@ func TestNewWithMessage(t *testing.T) {
 func TestNewWithError(t *testing.T) {
 
 	t.Run("return nil if error provided is nil", func(t *testing.T) {
-		err := NewWithError(nil, nil)
+		err := NewWithErrorAndFields(nil, nil)
 		assert.Nil(t, err)
 	})
 
 	t.Run("should handle error and no fields", func(t *testing.T) {
 		errActual := fmt.Errorf("error vii, %v", 22)
-		var err error = NewWithError(errActual, nil)
-		assert.Equal(t, err.Error(), "Message: error vii, 22. Location: /github.com/hantonelli/errors/wrappederror_test.go:44")
+		var err error = NewWithErrorAndFields(errActual, nil)
+		assert.Equal(t, err.Error(), "Message: error vii, 22. Location: /github.com/hantonelli/errors/wrappederror_test.go:45")
 		assert.NotNil(t, err)
 		we, ok := err.(WrappedError)
 		if !ok {
@@ -56,8 +57,8 @@ func TestNewWithError(t *testing.T) {
 
 	t.Run("should handle error and fields", func(t *testing.T) {
 		errActual := fmt.Errorf("error vii, %v", 22)
-		var err error = NewWithError(errActual, fields)
-		assert.Equal(t, err.Error(), "Message: error vii, 22. Location: /github.com/hantonelli/errors/wrappederror_test.go:59. Fields: map[key:value key2:12].")
+		var err error = NewWithErrorAndFields(errActual, fields)
+		assert.Equal(t, err.Error(), "Message: error vii, 22. Location: /github.com/hantonelli/errors/wrappederror_test.go:60. Fields: map[key:value key2:12].")
 		assert.NotNil(t, err)
 		we, ok := err.(WrappedError)
 		if !ok {
@@ -71,9 +72,9 @@ func TestNewWithError(t *testing.T) {
 	t.Run("should wrap a previous error", func(t *testing.T) {
 		errPrevious := errors.New("previous")
 		errActual := fmt.Errorf("error vii, %v", 22)
-		var err error = WithError(errPrevious, errActual, fields)
+		var err error = WithErrorAndFields(errPrevious, errActual, fields)
 		assert.NotNil(t, err)
-		assert.Equal(t, err.Error(), "Message: error vii, 22. Location: /github.com/hantonelli/errors/wrappederror_test.go:74. Fields: map[key:value key2:12]. <br> Message: previous.")
+		assert.Equal(t, err.Error(), "Message: error vii, 22. Location: /github.com/hantonelli/errors/wrappederror_test.go:75. Fields: map[key:value key2:12]. <br> Message: previous.")
 		assert.NotNil(t, err)
 		we, ok := err.(WrappedError)
 		if !ok {
@@ -125,9 +126,7 @@ func TestNewWithError(t *testing.T) {
 			/github.com/hantonelli/errors/wrappederror_helper_test.go:35
 			 /github.com/hantonelli/errors/wrappederror_helper_test.go:25
 			 /github.com/hantonelli/errors/wrappederror_helper_test.go:16
-			 /github.com/hantonelli/errors/wrappederror_test.go:134
-			 /testing/testing.go:777
-			 /runtime/asm_amd64.s:2361
+			 /github.com/hantonelli/errors/wrappederror_test.go:133
 		`
 		expectedStacktrace = cleanSpaces(expectedStacktrace)
 
@@ -137,6 +136,7 @@ func TestNewWithError(t *testing.T) {
 		if !ok {
 			t.Error("Error is not WrappedError")
 		}
-		assert.Equal(t, we.GetStacktrace(), expectedStacktrace)
+		actualStacktrace := we.GetStacktrace()
+		assert.True(t, strings.HasPrefix(actualStacktrace, expectedStacktrace))
 	})
 }

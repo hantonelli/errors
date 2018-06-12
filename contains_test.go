@@ -36,7 +36,7 @@ func TestContainsGenericError(t *testing.T) {
 
 	t.Run("should return nil when other error is wrap", func(t *testing.T){
 		err := errors.New("other error")
-		firstWrap :=  WithError(err, firstWrapType, firstFields)
+		firstWrap :=  WithErrorAndFields(err, firstWrapType, firstFields)
 		assert.NotNil(t, firstWrap)
 
 		_, _, ok := ContainsGenericError(firstWrap)
@@ -44,7 +44,7 @@ func TestContainsGenericError(t *testing.T) {
 	})
 
 	t.Run("should return GE when it is wrap once", func(t *testing.T){
-		firstWrap :=  WithError(ge, firstWrapType, firstFields)
+		firstWrap :=  WithErrorAndFields(ge, firstWrapType, firstFields)
 		assert.NotNil(t, firstWrap)
 
 		ge, fields, ok := ContainsGenericError(firstWrap)
@@ -58,10 +58,10 @@ func TestContainsGenericError(t *testing.T) {
 	})
 
 	t.Run("should return GE when it is wrap twice", func(t *testing.T){
-		firstWrap :=  WithError(errOther, ge, firstFields)
+		firstWrap :=  WithErrorAndFields(errOther, ge, firstFields)
 		assert.NotNil(t, firstWrap)
 
-		secondWrap :=  WithError(firstWrap, secondWrapType, secondFields)
+		secondWrap :=  WithErrorAndFields(firstWrap, secondWrapType, secondFields)
 		assert.NotNil(t, secondWrap)
 
 		ge, fields, ok := ContainsGenericError(secondWrap)
@@ -74,10 +74,10 @@ func TestContainsGenericError(t *testing.T) {
 	})
 
 	t.Run("should return GE when it is in the middle", func(t *testing.T){
-		firstWrap :=  WithError(ge, firstWrapType, firstFields)
+		firstWrap :=  WithErrorAndFields(ge, firstWrapType, firstFields)
 		assert.NotNil(t, firstWrap)
 
-		secondWrap :=  WithError(firstWrap, secondWrapType, secondFields)
+		secondWrap :=  WithErrorAndFields(firstWrap, secondWrapType, secondFields)
 		assert.NotNil(t, secondWrap)
 
 		ge, fields, ok := ContainsGenericError(secondWrap)
@@ -90,10 +90,10 @@ func TestContainsGenericError(t *testing.T) {
 	})
 
 	t.Run("should return GE when it is at last", func(t *testing.T){
-		firstWrap :=  WithError(errOther, firstWrapType, firstFields)
+		firstWrap :=  WithErrorAndFields(errOther, firstWrapType, firstFields)
 		assert.NotNil(t, firstWrap)
 
-		secondWrap :=  WithError(firstWrap, ge, secondFields)
+		secondWrap :=  WithErrorAndFields(firstWrap, ge, secondFields)
 		assert.NotNil(t, secondWrap)
 
 		ge, fields, ok := ContainsGenericError(secondWrap)

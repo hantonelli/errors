@@ -15,7 +15,7 @@ func cleanSpaces(txt string) string {
 func getThirdWrap() error {
 	secondWrap := getSecondWrap()
 	errThirdWrap := errors.New("third wrap")
-	return WithError(secondWrap, errThirdWrap, map[string]interface{}{
+	return WithErrorAndFields(secondWrap, errThirdWrap, map[string]interface{}{
 		"third-wrap-string": "test-string",
 		"third-wrap-number": 123,
 	})
@@ -24,7 +24,7 @@ func getThirdWrap() error {
 func getSecondWrap() error {
 	firstWrap := getFirstWrapped()
 	errSecondWrap := errors.New("second wrap")
-	return WithError(firstWrap, errSecondWrap, map[string]interface{}{
+	return WithErrorAndFields(firstWrap, errSecondWrap, map[string]interface{}{
 		"second-wrap-string": "test-string",
 		"second-wrap-number": 123,
 	})
@@ -32,7 +32,7 @@ func getSecondWrap() error {
 
 func getFirstWrapped() error {
 	externalError := getExternalError()
-	return NewWithError(externalError, map[string]interface{}{
+	return NewWithErrorAndFields(externalError, map[string]interface{}{
 		"first-wrap-string": "test-string",
 		"first-wrap-number": 123,
 	})
