@@ -1,22 +1,22 @@
 package errors
 
-type GenericErrorI interface {
+type GenericError interface {
 	error
 	IsGenericError() bool
 }
 
-type GenericError struct {}
+type genericError struct {}
 
-func (g GenericError) Error() string {
+func (g genericError) Error() string {
 	return "GenericError"
 }
 
-func (g GenericError) IsGenericError() bool {
+func (g genericError) IsGenericError() bool {
 	return true
 }
 
-func ContainsGenericError(err error) (GenericErrorI, map[string]interface{}, bool) {
-	ce, isExpectedType := err.(GenericErrorI)
+func ContainsGenericError(err error) (GenericError, map[string]interface{}, bool) {
+	ce, isExpectedType := err.(GenericError)
 	if isExpectedType {
 		return ce, map[string]interface{}{}, true
 	}
@@ -24,12 +24,12 @@ func ContainsGenericError(err error) (GenericErrorI, map[string]interface{}, boo
 	if !isWrappedError {
 		return nil, map[string]interface{}{}, false
 	}
-	ge1, isActualExpectedType := we.GetActual().(GenericError)
+	ge1, isActualExpectedType := we.GetActual().(genericError)
 	if isActualExpectedType {
 		return ge1, we.GetFields(), true
 	}
 	if we.GetPrevious() != nil {
-		ge2, isPreviousExpectedType := we.GetPrevious().(GenericError)
+		ge2, isPreviousExpectedType := we.GetPrevious().(genericError)
 		if isPreviousExpectedType {
 			return ge2, we.GetFields(), true
 		}

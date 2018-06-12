@@ -10,7 +10,7 @@ import (
 func TestContainsGenericError(t *testing.T) {
 
 	errOther := errors.New("other error")
-	ge := GenericError{}
+	ge := genericError{}
 	firstWrapType := errors.New("first")
 	firstFields :=  map[string]interface{}{
 		"first-wrap-string": "test-string",
