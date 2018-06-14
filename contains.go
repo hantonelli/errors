@@ -1,20 +1,23 @@
 package errors
 
+// GenericError is an interface of the error to use as an example of how to write a Contains function.
 type GenericError interface {
 	error
 	IsGenericError() bool
 }
 
-type genericError struct {}
+type genericError struct{}
 
 func (g genericError) Error() string {
 	return "GenericError"
 }
 
+// IsGenericError returns always true and is used to identify an error type
 func (g genericError) IsGenericError() bool {
 	return true
 }
 
+// ContainsGenericError takes an error and returns a concrete error if it is present in the error chain.
 func ContainsGenericError(err error) (GenericError, map[string]interface{}, bool) {
 	ce, isExpectedType := err.(GenericError)
 	if isExpectedType {

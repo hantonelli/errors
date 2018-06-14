@@ -238,3 +238,60 @@ func getStacktrace() string {
 	}
 	return b.String()
 }
+
+// ContainsError takes an error to look for and the error that needs to analyse. It compares the
+// errors by comparing the string returned by Error().
+func ContainsError(lookFor, err error) (error, map[string]interface{}, bool) {
+	if lookFor == nil || err == nil {
+		return nil, map[string]interface{}{}, false
+	}
+	if err.Error() == lookFor.Error() {
+		return err, map[string]interface{}{}, true
+	}
+	we, isWrappedError := err.(WrappedError)
+	if !isWrappedError {
+		return nil, map[string]interface{}{}, false
+	}
+
+	if we.GetActual().Error() == lookFor.Error() {
+		return we.GetActual(), we.GetFields(), true
+	}
+	if we.GetPrevious() != nil {
+		if we.GetPrevious().Error() == lookFor.Error() {
+			return we.GetPrevious(), we.GetFields(), true
+		}
+		prev, isPreviousWrappedError := we.GetPrevious().(WrappedError)
+		if isPreviousWrappedError {
+			return ContainsError(lookFor, prev)
+		}
+	}
+	return nil, map[string]interface{}{}, false
+}
+
+// ContainsErrorPrefix takes a prefix msg to look and an error chain and returns the error if it is found.
+func ContainsErrorPrefix(prefixMsg string, err error) (error, map[string]interface{}, bool) {
+	if prefixMsg == "" || err == nil {
+		return nil, map[string]interface{}{}, false
+	}
+	if err.Error() != "" && strings.HasPrefix(err.Error(), prefixMsg) {
+		return err, map[string]interface{}{}, true
+	}
+	we, isWrappedError := err.(WrappedError)
+	if !isWrappedError {
+		return nil, map[string]interface{}{}, false
+	}
+
+	if we.GetActual().Error() != "" && strings.HasPrefix(we.GetActual().Error(), prefixMsg) {
+		return we.GetActual(), we.GetFields(), true
+	}
+	if we.GetPrevious() != nil {
+		if we.GetPrevious().Error() != "" && strings.HasPrefix(we.GetPrevious().Error(), prefixMsg) {
+			return we.GetPrevious(), we.GetFields(), true
+		}
+		prev, isPreviousWrappedError := we.GetPrevious().(WrappedError)
+		if isPreviousWrappedError {
+			return ContainsErrorPrefix(prefixMsg, prev)
+		}
+	}
+	return nil, map[string]interface{}{}, false
+}

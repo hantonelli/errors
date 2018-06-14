@@ -1,10 +1,11 @@
 package errors
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
-	"reflect"
 	"errors"
+	"reflect"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestContainsGenericError(t *testing.T) {
@@ -12,7 +13,7 @@ func TestContainsGenericError(t *testing.T) {
 	errOther := errors.New("other error")
 	ge := genericError{}
 	firstWrapType := errors.New("first")
-	firstFields :=  map[string]interface{}{
+	firstFields := map[string]interface{}{
 		"first-wrap-string": "test-string",
 		"first-wrap-number": 123,
 	}
@@ -22,29 +23,29 @@ func TestContainsGenericError(t *testing.T) {
 		"second-wrap-number": 123,
 	}
 
-	t.Run("should return nil when it does not exists", func(t *testing.T){
+	t.Run("should return nil when it does not exists", func(t *testing.T) {
 		_, _, ok := ContainsGenericError(errOther)
 		assert.False(t, ok)
 	})
 
-	t.Run("should return GE when it is not wrap", func(t *testing.T){
+	t.Run("should return GE when it is not wrap", func(t *testing.T) {
 		extractedGE, fields, ok := ContainsGenericError(ge)
 		assert.True(t, ok)
 		assert.Equal(t, ge, extractedGE)
 		assert.Equal(t, map[string]interface{}{}, fields)
 	})
 
-	t.Run("should return nil when other error is wrap", func(t *testing.T){
+	t.Run("should return nil when other error is wrap", func(t *testing.T) {
 		err := errors.New("other error")
-		firstWrap :=  WithErrorAndFields(err, firstWrapType, firstFields)
+		firstWrap := WithErrorAndFields(err, firstWrapType, firstFields)
 		assert.NotNil(t, firstWrap)
 
 		_, _, ok := ContainsGenericError(firstWrap)
 		assert.False(t, ok)
 	})
 
-	t.Run("should return GE when it is wrap once", func(t *testing.T){
-		firstWrap :=  WithErrorAndFields(ge, firstWrapType, firstFields)
+	t.Run("should return GE when it is wrap once", func(t *testing.T) {
+		firstWrap := WithErrorAndFields(ge, firstWrapType, firstFields)
 		assert.NotNil(t, firstWrap)
 
 		ge, fields, ok := ContainsGenericError(firstWrap)
@@ -57,11 +58,11 @@ func TestContainsGenericError(t *testing.T) {
 		}
 	})
 
-	t.Run("should return GE when it is wrap twice", func(t *testing.T){
-		firstWrap :=  WithErrorAndFields(errOther, ge, firstFields)
+	t.Run("should return GE when it is wrap twice", func(t *testing.T) {
+		firstWrap := WithErrorAndFields(errOther, ge, firstFields)
 		assert.NotNil(t, firstWrap)
 
-		secondWrap :=  WithErrorAndFields(firstWrap, secondWrapType, secondFields)
+		secondWrap := WithErrorAndFields(firstWrap, secondWrapType, secondFields)
 		assert.NotNil(t, secondWrap)
 
 		ge, fields, ok := ContainsGenericError(secondWrap)
@@ -73,11 +74,11 @@ func TestContainsGenericError(t *testing.T) {
 		}
 	})
 
-	t.Run("should return GE when it is in the middle", func(t *testing.T){
-		firstWrap :=  WithErrorAndFields(ge, firstWrapType, firstFields)
+	t.Run("should return GE when it is in the middle", func(t *testing.T) {
+		firstWrap := WithErrorAndFields(ge, firstWrapType, firstFields)
 		assert.NotNil(t, firstWrap)
 
-		secondWrap :=  WithErrorAndFields(firstWrap, secondWrapType, secondFields)
+		secondWrap := WithErrorAndFields(firstWrap, secondWrapType, secondFields)
 		assert.NotNil(t, secondWrap)
 
 		ge, fields, ok := ContainsGenericError(secondWrap)
@@ -89,11 +90,11 @@ func TestContainsGenericError(t *testing.T) {
 		}
 	})
 
-	t.Run("should return GE when it is at last", func(t *testing.T){
-		firstWrap :=  WithErrorAndFields(errOther, firstWrapType, firstFields)
+	t.Run("should return GE when it is at last", func(t *testing.T) {
+		firstWrap := WithErrorAndFields(errOther, firstWrapType, firstFields)
 		assert.NotNil(t, firstWrap)
 
-		secondWrap :=  WithErrorAndFields(firstWrap, ge, secondFields)
+		secondWrap := WithErrorAndFields(firstWrap, ge, secondFields)
 		assert.NotNil(t, secondWrap)
 
 		ge, fields, ok := ContainsGenericError(secondWrap)
